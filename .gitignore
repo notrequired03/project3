@@ -1,0 +1,21 @@
+# Byte-compiled / optimized files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv
+venv/
+ENV/
+env/
+
+# Configuration & Session Persistence (Contains Twitter Passwords & Cookies)
+config.json
+cookies.json
+*.log
+server_error.txt
+debug_server.log
+
+# OS generated files
+.DS_Store
+Thumbs.db
