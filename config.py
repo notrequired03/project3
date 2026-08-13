@@ -4,7 +4,7 @@ import threading
 from datetime import datetime
 
 CONFIG_FILE = "config.json"
-lock = threading.Lock()
+lock = threading.RLock()
 
 DEFAULT_CONFIG = {
     "admin_username": "1511761010",
