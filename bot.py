@@ -47,10 +47,11 @@ def generate_ai_text(prompt_text, system_instruction=None):
                 config={
                     "system_instruction": full_system,
                     "temperature": 0.9,
-                    "max_output_tokens": 280,
+                    "max_output_tokens": 500,
                 }
             )
-            return response.text.strip()
+            text = response.text.strip().strip('"\'')
+            return text
         except Exception as e:
             err_str = str(e)
             if "API_KEY_INVALID" in err_str or "API key not valid" in err_str:
@@ -106,18 +107,26 @@ def generate_meme_tweet_content():
     Generates a Ryanair-style hilarious post about chathere.online
     """
     topics = [
-        "Roast people spending 4 hours scrolling TikTok when they could talk to real humans instantly on chathere.online",
-        "Mock legacy chat apps, laggy Discord voice calls, or awkward Zoom meetings vs 0-lag chathere.online",
-        "A funny Ryanair-style meme quote about modern dating apps vs randomly connecting on chathere.online",
-        "Sarcastic advice for people who say 'I'm bored online' while ignoring chathere.online",
-        "Funny unhinged corporate banter comparing high flight prices to chathere.online being 100% free with no sign-up",
-        "A hilarious roast of people who still miss Omegle when chathere.online exists"
+        "Savage roast of paying $30/month for Tinder Gold just to get 0 replies, vs meeting real people instantly for free on chathere.online",
+        "Mocking people spending 3 hours in dead Discord server waiting rooms vs 0-lag instant video chat on chathere.online",
+        "Ryanair-style priority boarding announcement: Priority queue for people who want instant video chat without 15 sign-up forms is chathere.online",
+        "Unhinged roast of people posting 'RIP Omegle' in 2026 like bro move on, chathere.online was right here the whole time",
+        "Brutal joke about people complaining 'nobody texts me back' while ignoring 10,000 active people on chathere.online right now",
+        "Watching a 4-hour Twitch stream just to feel human interaction vs hopping on chathere.online in 2 seconds",
+        "Savage relationship advice: Your ex is not coming back, but stranger video chat on chathere.online is instant and free",
+        "Unhinged Ryanair travel joke: Imagine paying $100 for plane tickets when you can travel the world meeting random strangers on chathere.online from bed",
+        "Sarcastic roast of people who get nervous ordering coffee but want to make new friends: Start easy on chathere.online",
+        "Mocking dead group chats where the last message was 'hi' 3 weeks ago vs non-stop live action on chathere.online"
     ]
     selected_topic = random.choice(topics)
     prompt = (
-        f"Topic: {selected_topic}\n\n"
-        "Write a single viral, hilarious tweet (max 220 characters). Make it unhinged, snappy, sarcastic, and funny like Ryanair's Twitter. "
-        "Include 'chathere.online' or '#chathere' naturally in the tweet. Do NOT use emojis excessively."
+        f"Topic instruction: {selected_topic}\n\n"
+        "Write ONE viral, unhinged, savagely funny Ryanair-style tweet.\n"
+        "CRITICAL REQUIREMENTS:\n"
+        "- MUST be between 100 and 220 characters.\n"
+        "- MUST be a complete, fully-formed punchline ending with punctuation (. or ! or ?).\n"
+        "- DO NOT stop or cut off mid-sentence.\n"
+        "- Include 'chathere.online' or '#chathere' naturally."
     )
     return generate_ai_text(prompt)
 
