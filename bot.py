@@ -36,29 +36,13 @@ def generate_ai_text(prompt_text, system_instruction=None):
 
     full_system = system_instruction or cfg.get("persona_prompt")
 
-    # Try gemini-2.0-flash first, fallback to gemini-1.5-flash if needed
-    try:
-        response = client.models.generate_content(
-            model="gemini-2.0-flash",
-            contents=prompt_text,
-            config={
-                "system_instruction": full_system,
-                "temperature": 0.9,
-                "max_output_tokens": 280,
-            }
-        )
-        return response.text.strip()
-    except Exception as e:
-        err_str = str(e)
-        if "API_KEY_INVALID" in err_str or "API key not valid" in err_str:
-            error_msg = "Invalid Gemini API Key! Please get a new free API key at https://aistudio.google.com/ and set it in your Dashboard or Render Environment Variables."
-            add_log(error_msg, level="ERROR")
-            raise ValueError(error_msg)
+    models_to_try = ["gemini-3.7-flash", "gemini-2.5-flash", "gemini-2.0-flash"]
+    last_error = None
 
-        add_log(f"gemini-2.0-flash call failed, trying gemini-1.5-flash: {e}", level="WARNING")
+    for model_name in models_to_try:
         try:
             response = client.models.generate_content(
-                model="gemini-1.5-flash",
+                model=model_name,
                 contents=prompt_text,
                 config={
                     "system_instruction": full_system,
@@ -67,13 +51,17 @@ def generate_ai_text(prompt_text, system_instruction=None):
                 }
             )
             return response.text.strip()
-        except Exception as e2:
-            err_str2 = str(e2)
-            if "API_KEY_INVALID" in err_str2 or "API key not valid" in err_str2:
+        except Exception as e:
+            err_str = str(e)
+            if "API_KEY_INVALID" in err_str or "API key not valid" in err_str:
                 error_msg = "Invalid Gemini API Key! Please get a new free API key at https://aistudio.google.com/ and set it in your Dashboard or Render Environment Variables."
                 add_log(error_msg, level="ERROR")
                 raise ValueError(error_msg)
-            raise e2
+
+            last_error = e
+            add_log(f"Model {model_name} call failed: {e}. Trying next model...", level="WARNING")
+
+    raise last_error
 
 
 async def get_twikit_client():
