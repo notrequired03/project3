@@ -36,10 +36,10 @@ def generate_ai_text(prompt_text, system_instruction=None):
 
     full_system = system_instruction or cfg.get("persona_prompt")
 
-    # Try gemini-3.6-flash first, fallback to gemini-2.5-flash if needed
+    # Try gemini-2.0-flash first, fallback to gemini-1.5-flash if needed
     try:
         response = client.models.generate_content(
-            model="gemini-3.6-flash",
+            model="gemini-2.0-flash",
             contents=prompt_text,
             config={
                 "system_instruction": full_system,
@@ -55,10 +55,10 @@ def generate_ai_text(prompt_text, system_instruction=None):
             add_log(error_msg, level="ERROR")
             raise ValueError(error_msg)
 
-        add_log(f"gemini-3.6-flash call failed, trying gemini-2.5-flash: {e}", level="WARNING")
+        add_log(f"gemini-2.0-flash call failed, trying gemini-1.5-flash: {e}", level="WARNING")
         try:
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-1.5-flash",
                 contents=prompt_text,
                 config={
                     "system_instruction": full_system,
