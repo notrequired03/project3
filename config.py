@@ -12,7 +12,7 @@ DEFAULT_CONFIG = {
     "twitter_username": "chathere_online",
     "twitter_email": "",
     "twitter_password": "Charan@123",
-    "gemini_api_key": "AIzaSyAgrVtcZuh4aXUAlZL4kJHbbpQxtWXz_jw",
+    "gemini_api_key": "",
     "bot_enabled": False,
     "post_interval_minutes": 30,
     "auto_reply_enabled": True,

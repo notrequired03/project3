@@ -24,7 +24,7 @@ def generate_ai_text(prompt_text, system_instruction=None):
     Generates text using Google GenAI SDK with gemini-3.6-flash or gemini-2.5-flash.
     """
     cfg = get_config()
-    api_key = cfg.get("gemini_api_key") or os.environ.get("GEMINI_API_KEY")
+    api_key = os.environ.get("GEMINI_API_KEY") or cfg.get("gemini_api_key")
 
     if not api_key:
         raise ValueError("Gemini API key is missing. Please set it in the Dashboard.")
