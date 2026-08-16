@@ -84,15 +84,27 @@ async def get_twikit_client():
         raise ImportError("twikit is not installed.")
 
     cfg = get_config()
+    auth_token = os.environ.get("TWITTER_AUTH_TOKEN") or cfg.get("twitter_auth_token")
+    ct0 = os.environ.get("TWITTER_CT0") or cfg.get("twitter_ct0")
     username = cfg.get("twitter_username")
     email = cfg.get("twitter_email")
     password = cfg.get("twitter_password")
 
-    if not username or not password:
-        raise ValueError("Twitter credentials missing. Please set username & password in Dashboard.")
-
     tw_client = Client("en-US")
 
+    # Priority 1: Direct Cookie Authentication (Bypasses Twitter IP blocks / KEY_BYTE indices errors)
+    if auth_token and ct0:
+        try:
+            tw_client.set_cookies({
+                "auth_token": auth_token,
+                "ct0": ct0
+            })
+            add_log("Authenticated Twitter session using auth_token & ct0 cookies!")
+            return tw_client
+        except Exception as e:
+            add_log(f"Failed to set cookies: {e}", level="WARNING")
+
+    # Priority 2: Persistent cookies.json file
     cookie_file = "cookies.json"
     if os.path.exists(cookie_file):
         try:
@@ -102,15 +114,30 @@ async def get_twikit_client():
         except Exception as e:
             add_log(f"Failed to load cookies.json, re-authenticating: {e}", level="WARNING")
 
+    # Priority 3: Username & Password Login
+    if not username or not password:
+        raise ValueError("Twitter credentials missing. Please set username & password in Dashboard.")
+
     add_log(f"Logging in to Twitter as @{username}...")
-    await tw_client.login(
-        auth_info_1=username,
-        auth_info_2=email,
-        password=password
-    )
-    tw_client.save_cookies(cookie_file)
-    add_log("Successfully logged in to Twitter and saved cookies.json")
-    return tw_client
+    try:
+        await tw_client.login(
+            auth_info_1=username,
+            auth_info_2=email,
+            password=password
+        )
+        tw_client.save_cookies(cookie_file)
+        add_log("Successfully logged in to Twitter and saved cookies.json")
+        return tw_client
+    except Exception as e:
+        err_str = str(e)
+        if "KEY_BYTE" in err_str or "indices" in err_str or "Denied" in err_str:
+            error_msg = (
+                "Twitter blocked automated login ('KEY_BYTE indices' error).\n"
+                "FIX: Please copy your browser's 'auth_token' and 'ct0' cookies and set TWITTER_AUTH_TOKEN and TWITTER_CT0 in your Render Environment Variables."
+            )
+            add_log(error_msg, level="ERROR")
+            raise ValueError(error_msg)
+        raise e
 
 
 def generate_meme_tweet_content():
