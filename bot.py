@@ -51,6 +51,17 @@ def generate_ai_text(prompt_text, system_instruction=None):
                 }
             )
             text = response.text.strip().strip('"\'')
+            
+            # Post-processing: Ensure no mid-sentence truncation
+            if text and text[-1] not in ".!?":
+                # Check if last word is a fragment/preposition that indicates truncation
+                words = text.split()
+                incomplete_words = {"get", "with", "and", "the", "for", "to", "on", "in", "at", "a", "an", "is", "are", "when", "you", "can", "chath", "or", "of"}
+                if words and words[-1].lower() in incomplete_words:
+                    # Strip incomplete trailing fragment
+                    words.pop()
+                    text = " ".join(words)
+                text = text.rstrip(",:;- ") + "."
             return text
         except Exception as e:
             err_str = str(e)
@@ -107,26 +118,26 @@ def generate_meme_tweet_content():
     Generates a Ryanair-style hilarious post about chathere.online
     """
     topics = [
-        "Savage roast of paying $30/month for Tinder Gold just to get 0 replies, vs meeting real people instantly for free on chathere.online",
-        "Mocking people spending 3 hours in dead Discord server waiting rooms vs 0-lag instant video chat on chathere.online",
-        "Ryanair-style priority boarding announcement: Priority queue for people who want instant video chat without 15 sign-up forms is chathere.online",
-        "Unhinged roast of people posting 'RIP Omegle' in 2026 like bro move on, chathere.online was right here the whole time",
-        "Brutal joke about people complaining 'nobody texts me back' while ignoring 10,000 active people on chathere.online right now",
-        "Watching a 4-hour Twitch stream just to feel human interaction vs hopping on chathere.online in 2 seconds",
-        "Savage relationship advice: Your ex is not coming back, but stranger video chat on chathere.online is instant and free",
-        "Unhinged Ryanair travel joke: Imagine paying $100 for plane tickets when you can travel the world meeting random strangers on chathere.online from bed",
-        "Sarcastic roast of people who get nervous ordering coffee but want to make new friends: Start easy on chathere.online",
-        "Mocking dead group chats where the last message was 'hi' 3 weeks ago vs non-stop live action on chathere.online"
+        "Savage roast of paying $30/month for Tinder Gold just to get 0 replies, vs meeting real people instantly for free on chathere.online.",
+        "Mocking people spending 3 hours in dead Discord server waiting rooms vs 0-lag instant video chat on chathere.online.",
+        "Ryanair-style priority boarding announcement: Priority queue for people who want instant video chat without 15 sign-up forms is chathere.online.",
+        "Unhinged roast of people posting 'RIP Omegle' in 2026 like bro move on, chathere.online was right here the whole time.",
+        "Brutal joke about people complaining 'nobody texts me back' while ignoring active people on chathere.online right now.",
+        "Watching a 4-hour Twitch stream just to feel human interaction vs hopping on chathere.online in 2 seconds.",
+        "Savage relationship advice: Your ex is not coming back, but stranger video chat on chathere.online is instant and free.",
+        "Unhinged Ryanair travel joke: Imagine paying $100 for plane tickets to sit next to a crying baby when you can meet random strangers worldwide on chathere.online from bed.",
+        "Sarcastic roast of people who get nervous ordering coffee but want to make new friends: Start easy on chathere.online.",
+        "Mocking dead group chats where the last message was 'hi' 3 weeks ago vs non-stop live action on chathere.online."
     ]
     selected_topic = random.choice(topics)
     prompt = (
-        f"Topic instruction: {selected_topic}\n\n"
-        "Write ONE viral, unhinged, savagely funny Ryanair-style tweet.\n"
-        "CRITICAL REQUIREMENTS:\n"
-        "- MUST be between 100 and 220 characters.\n"
-        "- MUST be a complete, fully-formed punchline ending with punctuation (. or ! or ?).\n"
-        "- DO NOT stop or cut off mid-sentence.\n"
-        "- Include 'chathere.online' or '#chathere' naturally."
+        f"Topic idea: {selected_topic}\n\n"
+        "Write ONE punchy, viral, hilarious Ryanair-style tweet.\n"
+        "INSTRUCTIONS:\n"
+        "- Write 1 or 2 complete, funny sentences.\n"
+        "- Include 'chathere.online' naturally in the tweet.\n"
+        "- Make it sound 100% human, funny, and authentic so people actually want to use the site.\n"
+        "- Do NOT cut off mid-sentence."
     )
     return generate_ai_text(prompt)
 
